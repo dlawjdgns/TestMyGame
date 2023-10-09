@@ -18,6 +18,8 @@ class TESTMYGAME_API AMyTestGameCharacter : public AMyBasicCharacter
 public:
 	AMyTestGameCharacter();
 
+	virtual void PostInitializeComponents() override;
+
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Camera")
 		class USpringArmComponent* CameraBoom;
 

@@ -2,10 +2,11 @@
 
 #pragma once
 
+#include "Particles/ParticleSystem.h"
+#include "MyBasicCharacter.h"
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "MyTestWeapon.generated.h"
-#include "MyBasicCharacter.h"
 
 UCLASS()
 class TESTMYGAME_API AMyTestWeapon : public AActor
@@ -36,5 +37,10 @@ protected:
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+
+	virtual void NotifyActorBeginOverlap(AActor* OtherActor);
+
+	UPROPERTY(EditDefaultsOnly, Category = "MyFX")
+		UParticleSystem* HitFX;
 
 };

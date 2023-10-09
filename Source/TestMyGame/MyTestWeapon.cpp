@@ -3,6 +3,8 @@
 
 #include "MyTestWeapon.h"
 #include "Components/BoxComponent.h"
+#include "UObject/UObjectGlobals.h"
+#include "Kismet/GameplayStatics.h"
 
 // Sets default values
 AMyTestWeapon::AMyTestWeapon(const FObjectInitializer& ObjectInitializer):Super(ObjectInitializer)
@@ -15,7 +17,15 @@ AMyTestWeapon::AMyTestWeapon(const FObjectInitializer& ObjectInitializer):Super(
 	RootComponent = WeaponMesh;
 
 	WeaponCollision = CreateDefaultSubobject<UBoxComponent>(TEXT("WeaponCollision"));
+	WeaponCollision->SetBoxExtent(FVector(5.f, 5.f, 5.f));
 	WeaponCollision->AttachTo(WeaponMesh, "DamageSocket");
+
+	static ConstructorHelpers::FObjectFinder<UParticleSystem> ParticleAsset(TEXT("ParticleSystem'/Game/StarterContent/Particles/P_Explosion.P_Explosion'"));
+
+	if (ParticleAsset.Succeeded())
+	{
+		HitFX = ParticleAsset.Object;
+	}
 
 }
 
@@ -31,13 +41,15 @@ void AMyTestWeapon::AttachMeshToPawn()
 {
 	if (MyPawn)
 	{
-		USkeletalMeshComponent* PawnMesh = MyPawn
+		USkeletalMeshComponent* PawnMesh = MyPawn->GetSpesificPawnMesh();
+		FName AttachPoint = MyPawn->GetWeaponAttachPoint();
+		WeaponMesh->AttachTo(PawnMesh,AttachPoint);
 	}
 }
 
 void AMyTestWeapon::OnEquip(const AMyTestWeapon* LastWeapon)
 {
-
+	AttachMeshToPawn();
 }
 
 // Called when the game starts or when spawned
@@ -52,5 +64,18 @@ void AMyTestWeapon::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+}
+
+void AMyTestWeapon::NotifyActorBeginOverlap(AActor* OtherActor)
+{
+	Super::NotifyActorBeginOverlap(OtherActor);
+
+	if (OtherActor->IsA(AActor::StaticClass()) && MyPawn->isDuringAttack && OtherActor != MyPawn)
+	{
+		UGameplayStatics::ApplyDamage(OtherActor, 10.f, NULL, this, UDamageType::StaticClass());
+		GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Red, "ApplyDamage!");
+
+		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), HitFX, GetActorLocation());
+	}
 }
 

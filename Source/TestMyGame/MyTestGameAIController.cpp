@@ -1,30 +1,17 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-#include "MyTestGameCharacter.h"
 #include "MyTestGameAIController.h"
 #include "Perception/AIPerceptionComponent.h"
 #include "Perception/AISenseConfig_Sight.h"
 #include "Kismet/GameplayStatics.h"
+#include "MyTestGameCharacter.h"
 
-AMyTestGameAIController::AMyTestGameAIController()
+
+AMyTestGameAIController::AMyTestGameAIController(FObjectInitializer const& object_initializer)
 {
 	PrimaryActorTick.bCanEverTick = true;
 
-	SightConfig = CreateDefaultSubobject<UAISenseConfig_Sight>(TEXT("Sight Config"));
-	SetPerceptionComponent(*CreateDefaultSubobject<UAIPerceptionComponent>(TEXT("Perception Component")));
-
-	SightConfig->SightRadius = AISightRadius;
-	SightConfig->LoseSightRadius = AILoseSightRadius;
-	SightConfig->PeripheralVisionAngleDegrees = AIFieldOfView;
-	SightConfig->SetMaxAge(AISightAge);
-
-	SightConfig->DetectionByAffiliation.bDetectEnemies = true;
-	SightConfig->DetectionByAffiliation.bDetectFriendlies = true;
-	SightConfig->DetectionByAffiliation.bDetectNeutrals = true;
-
-	GetPerceptionComponent()->SetDominantSense(*SightConfig->GetSenseImplementation());
-	GetPerceptionComponent()->OnPerceptionUpdated.AddDynamic(this, &AMyTestGameAIController::OnPawnDetected);
-	GetPerceptionComponent()->ConfigureSense(*SightConfig);
+	setup_perception_system();
 }
 
 void AMyTestGameAIController::BeginPlay()
@@ -49,14 +36,6 @@ void AMyTestGameAIController::OnPossess(APawn* pawn)
 void AMyTestGameAIController::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
-
-	AMyTestGameCharacter* character = Cast<AMyTestGameCharacter>(GetPawn());
-
-	if (bIsPlayerDetected == true)
-	{
-		AMyTestGameCharacter* Player = Cast<AMyTestGameCharacter>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
-		MoveToActor(Player, 5.0f);
-	}
 }
 
 FRotator AMyTestGameAIController::GetControlRotation() const
@@ -69,14 +48,34 @@ FRotator AMyTestGameAIController::GetControlRotation() const
 	return FRotator(0.f, GetPawn()->GetActorRotation().Yaw, 0.0f);
 }
 
-void AMyTestGameAIController::OnPawnDetected(const TArray<AActor*> &DetectedPawns)
+UBlackboardComponent* AMyTestGameAIController::get_blackboard()
 {
-	for (size_t i = 0; i < DetectedPawns.Num(); i++)
+	return nullptr;
+}
+
+void AMyTestGameAIController::on_target_detected(AActor* actor, FAIStimulus const stimulus)
+{
+	if (auto const ch = Cast<AMyTestGameCharacter>(actor))
 	{
-		DistanceToPlayer = GetPawn()->GetDistanceTo(DetectedPawns[i]);
-
-		UE_LOG(LogTemp, Warning, TEXT("Distance : %f"), DistanceToPlayer);
+		GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Red, "Find Player!!");
 	}
+}
 
-	bIsPlayerDetected = true;
+void AMyTestGameAIController::setup_perception_system()
+{
+	sight_config = CreateDefaultSubobject<UAISenseConfig_Sight>(TEXT("Sight Config"));
+	SetPerceptionComponent(*CreateDefaultSubobject<UAIPerceptionComponent>(TEXT("Perception Component")));
+
+	sight_config->SightRadius = 500.f;
+	sight_config->LoseSightRadius = sight_config->SightRadius + 50.0f;
+	sight_config->PeripheralVisionAngleDegrees = 90.0f;
+	sight_config->SetMaxAge(5.0f);
+	sight_config->AutoSuccessRangeFromLastSeenLocation = 520.0f;
+	sight_config->DetectionByAffiliation.bDetectEnemies = true;
+	sight_config->DetectionByAffiliation.bDetectFriendlies = true;
+	sight_config->DetectionByAffiliation.bDetectNeutrals = true;
+
+	GetPerceptionComponent()->SetDominantSense(*sight_config->GetSenseImplementation());
+	GetPerceptionComponent()->OnTargetPerceptionUpdated.AddDynamic(this, &AMyTestGameAIController::on_target_detected);
+	GetPerceptionComponent()->ConfigureSense(*sight_config);
 }

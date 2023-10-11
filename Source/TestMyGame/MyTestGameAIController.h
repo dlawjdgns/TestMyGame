@@ -25,7 +25,7 @@ public:
 	virtual void Tick(float DeltaSeconds) override;
 	virtual FRotator GetControlRotation()const override;
 
-	UBlackboardComponent* get_blackboard();
+	class UBlackboardComponent* get_blackboard();
 
 	UFUNCTION(BlueprintCallable, Category = Behavior)
 		void on_target_detected(AActor* actor, FAIStimulus const stimulus);

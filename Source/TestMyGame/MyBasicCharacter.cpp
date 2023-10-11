@@ -7,6 +7,8 @@
 #include "MyTestWeapon.h"
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Perception/AIPerceptionStimuliSourceComponent.h"
+#include "Perception/AISense_Sight.h"
 
 // Sets default values
 AMyBasicCharacter::AMyBasicCharacter()
@@ -20,6 +22,8 @@ AMyBasicCharacter::AMyBasicCharacter()
 	myMaxHealth = 100.f;
 
 	myHealth = myMaxHealth;
+
+	setup_stimulus();
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -216,5 +220,13 @@ float AMyBasicCharacter::TakeDamage(float DamageAmount, FDamageEvent const& Dama
 		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("HP is : %f"), myHealth));
 	}
 	return myGetDamage;
+}
+
+void AMyBasicCharacter::setup_stimulus()
+{
+	stimulus = CreateDefaultSubobject<UAIPerceptionStimuliSourceComponent>(TEXT("stimulus"));
+	stimulus->RegisterForSense(TSubclassOf<UAISense_Sight>());
+	stimulus->RegisterWithPerceptionSystem();
+
 }
 

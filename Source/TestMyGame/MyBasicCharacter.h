@@ -76,6 +76,8 @@ public:
 	bool isDuringAttack = true;
 	int32 ComboAttack_Num;
 
-	
+private:
+	class UAIPerceptionStimuliSourceComponent* stimulus;
+	void setup_stimulus();
 
 };

@@ -60,7 +60,7 @@ FRotator AMyTestGameAIController::GetControlRotation() const
 
 UBlackboardComponent* AMyTestGameAIController::get_blackboard()
 {
-	return nullptr;
+	return blackboard;
 }
 
 void AMyTestGameAIController::on_target_detected(AActor* actor, FAIStimulus const stimulus)

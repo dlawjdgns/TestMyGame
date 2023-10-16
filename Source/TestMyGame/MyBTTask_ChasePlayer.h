@@ -18,5 +18,5 @@ class TESTMYGAME_API UMyBTTask_ChasePlayer : public UBTTask_BlackboardBase
 public:
 	UMyBTTask_ChasePlayer(FObjectInitializer const& object_initializer);
 
-	EBTNodeResult::Type ExecuteTask(UBehaviorTreeComponent& owner_comp, uint8 node_memory);
+	EBTNodeResult::Type ExecuteTask(UBehaviorTreeComponent& owner_comp, uint8* node_memory);
 };

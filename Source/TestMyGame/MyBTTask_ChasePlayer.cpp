@@ -12,7 +12,7 @@ UMyBTTask_ChasePlayer::UMyBTTask_ChasePlayer(FObjectInitializer const& object_in
 	NodeName = TEXT("Chase Player");
 }
 
-EBTNodeResult::Type UMyBTTask_ChasePlayer::ExecuteTask(UBehaviorTreeComponent& owner_comp, uint8 node_memory)
+EBTNodeResult::Type UMyBTTask_ChasePlayer::ExecuteTask(UBehaviorTreeComponent& owner_comp, uint8* node_memory)
 {
 	AMyTestGameAIController* const cont = Cast<AMyTestGameAIController>(owner_comp.GetAIOwner());
 	FVector const player_location = cont->get_blackboard()->GetValueAsVector(bb_keys::target_location);

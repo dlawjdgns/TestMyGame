@@ -15,10 +15,10 @@ UMyBTTask_FindPlayerLocation::UMyBTTask_FindPlayerLocation(FObjectInitializer co
 	NodeName = TEXT("Find Player Location");
 }
 
-EBTNodeResult::Type UMyBTTask_FindPlayerLocation::ExecuteTask(UBehaviorTreeComponent& owner_comp, uint8 node_memory)
+EBTNodeResult::Type UMyBTTask_FindPlayerLocation::ExecuteTask(UBehaviorTreeComponent& owner_Comp, uint8* node_memory)
 {
 	ACharacter* const player = UGameplayStatics::GetPlayerCharacter(GetWorld(), 0);
-	auto const cont = Cast<AMyTestGameAIController>(owner_comp.GetAIOwner());
+	auto const cont = Cast<AMyTestGameAIController>(owner_Comp.GetAIOwner());
 
 	FVector const player_location = player->GetActorLocation();
 	if (search_random)
@@ -30,12 +30,10 @@ EBTNodeResult::Type UMyBTTask_FindPlayerLocation::ExecuteTask(UBehaviorTreeCompo
 		{
 			cont->get_blackboard()->SetValueAsVector(bb_keys::target_location, loc.Location);
 		}
-		else
-		{
-			cont->get_blackboard()->SetValueAsVector(bb_keys::target_location, player_location);
-		}
-
-
+	}
+	else
+	{
+		cont->get_blackboard()->SetValueAsVector(bb_keys::target_location, player_location);
 	}
 
 	return EBTNodeResult::Type();

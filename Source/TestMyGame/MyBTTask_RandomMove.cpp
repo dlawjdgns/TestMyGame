@@ -13,7 +13,7 @@ UMyBTTask_RandomMove::UMyBTTask_RandomMove(FObjectInitializer const& object_init
 	NodeName = TEXT("Find Random Location");
 }
 
-EBTNodeResult::Type UMyBTTask_RandomMove::ExecuteTast(UBehaviorTreeComponent& owner_Comp, uint8* NodeMemory)
+EBTNodeResult::Type UMyBTTask_RandomMove::ExecuteTask(UBehaviorTreeComponent& owner_Comp, uint8* NodeMemory)
 {
 	auto const cont = Cast<AMyTestGameAIController>(owner_Comp.GetAIOwner());
 	auto const npc = cont->GetPawn();
